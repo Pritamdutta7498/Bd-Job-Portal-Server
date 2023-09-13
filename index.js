@@ -34,6 +34,9 @@ async function run() {
     app.post("/postJob", async (req, res) => {
         const body = req.body;
         console.log(body);
+        if(!body){
+            return res.status(404).send({ message:'body data not validated!'})
+        }
         const result = await jobCollection.insertOne(body);
         res.send(result);
     });
