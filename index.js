@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, Collection } = require("mongodb");
 require("dotenv").config();
 
 const port = process.env.PORT || 5000;
@@ -9,9 +9,6 @@ const port = process.env.PORT || 5000;
 // middleware
 app.use(cors());
 app.use(express.json());
-
-
-
 
 // mongo connection
 
@@ -30,15 +27,16 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
-    // here you can start yor work-----
-    // creating a collection
 
-
-
-
-
-
-
+    // creating mongodb collection
+    const jobCollection = client.db("jobPortal").collection("jobs");
+    // inserting data
+    app.post("/postJob", async (req, res) => {
+        const body = req.body;
+        console.log(body);
+        const result = await jobCollection.insertOne(body);
+        res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
@@ -54,5 +52,7 @@ app.get("/", (req, res) => {
   res.send("project manager is working");
 });
 app.listen(port, () => {
-    console.log(`project manger is working on port ${port}`);
-  });
+  console.log(`project manger is working on port ${port}`);
+});
+
+
