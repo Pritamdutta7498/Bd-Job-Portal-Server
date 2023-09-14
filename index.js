@@ -43,17 +43,14 @@ async function run() {
 
     //get data
     app.get("/allJobs", async (req, res) => {
-        const result = await jobCollection.find({}).toArray();
-        res.send(result);
+      const result = await jobCollection.find({}).toArray();
+      res.send(result);
     });
-
 
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
-
-
   } finally {
     // await client.close();
   }
