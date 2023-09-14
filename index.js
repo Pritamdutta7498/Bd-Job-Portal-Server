@@ -33,6 +33,7 @@ async function run() {
     // inserting data
     app.post("/postJob", async (req, res) => {
       const body = req.body;
+      body.createdAt = new Date(); //for sorting jobs
       console.log(body);
       if (!body) {
         return res.status(404).send({ message: "body data not validated!" });
@@ -44,12 +45,18 @@ async function run() {
     //get data with filtering
     app.get("/allJobs/:text", async (req, res) => {
       if (req.params.text === "remote" || req.params.text === "offline") {
-        const result = await jobCollection.find({status: req.params.text}).toArray();
+        const result = await jobCollection
+          .find({ status: req.params.text })
+          .sort({ createdAt: -1 }) // 1 for ascending -1 for descending
+          .toArray();
         console.log(result);
-       return res.send(result);
+        return res.send(result);
       }
-      const result = await jobCollection.find({}).toArray();
-     res.send(result);
+      const result = await jobCollection
+        .find({})
+        .sort({ createdAt: -1 })
+        .toArray();
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
