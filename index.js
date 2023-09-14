@@ -38,7 +38,7 @@ async function run() {
         return res.status(404).send({ message: "body data not validated!" });
       }
       const result = await jobCollection.insertOne(body);
-    //   res.send(result);
+      res.send(result);
     });
 
     //get data
