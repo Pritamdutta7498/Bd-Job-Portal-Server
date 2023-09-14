@@ -41,10 +41,15 @@ async function run() {
       res.send(result);
     });
 
-    //get data
-    app.get("/allJobs", async (req, res) => {
+    //get data with filtering
+    app.get("/allJobs/:text", async (req, res) => {
+      if (req.params.text === "remote" || req.params.text === "offline") {
+        const result = await jobCollection.find({status: req.params.text}).toArray();
+        console.log(result);
+       return res.send(result);
+      }
       const result = await jobCollection.find({}).toArray();
-      res.send(result);
+     res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
