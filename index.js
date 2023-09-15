@@ -30,11 +30,33 @@ async function run() {
 
     // creating mongodb collection
     const jobCollection = client.db("jobPortal").collection("jobs");
+
+    // implementing the search result
+    const result = await jobCollection.createIndex(
+      { title: 1, category: 1 },
+      { name: "titleCategory" }
+    );
+
+    // creating job search result api
+    app.get("/jobSearchByTitle/:text", async (req, res) => {
+      const searchText = req.params.text;
+      const result = await jobCollection
+        .find({
+          $or: [
+            { title: { $regex: searchText, $options: "i" } },
+            { category: { $regex: searchText, $options: "i" } },
+          ],
+        })
+        .toArray();
+      res.send(result);
+      // console.log(result);
+    });
+
     // inserting data
     app.post("/postJob", async (req, res) => {
       const body = req.body;
       body.createdAt = new Date(); //for sorting jobs
-      console.log(body);
+      // console.log(body);
       if (!body) {
         return res.status(404).send({ message: "body data not validated!" });
       }
@@ -49,12 +71,20 @@ async function run() {
           .find({ status: req.params.text })
           .sort({ createdAt: -1 }) // 1 for ascending -1 for descending
           .toArray();
-        console.log(result);
+        // console.log(result);
         return res.send(result);
       }
       const result = await jobCollection
         .find({})
         .sort({ createdAt: -1 })
+        .toArray();
+      res.send(result);
+    });
+    // get data for myJob section
+    app.get("/myJob/:email", async (req, res) => {
+      // console.log(req.params.email);
+      const result = await jobCollection
+        .find({ postedBy: req.params.email })
         .toArray();
       res.send(result);
     });
